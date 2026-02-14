@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>藝術家 | Artist Portfolio</title>
+  <title>NEXUS | 數位藝術家</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0a;
-      --text: #f5f5f5;
-      --accent: #e8d5b7;
-      --muted: #666;
-      --font-display: 'Playfair Display', serif;
-      --font-body: 'Inter', sans-serif;
+      --bg: #050508;
+      --bg-secondary: #0a0a0f;
+      --primary: #00f0ff;
+      --secondary: #ff00aa;
+      --tertiary: #7b2dff;
+      --text: #e0e0e0;
+      --text-dim: #666;
+      --grid: rgba(0, 240, 255, 0.03);
     }
     
     * {
@@ -28,11 +30,39 @@
     }
     
     body {
-      font-family: var(--font-body);
+      font-family: 'Noto Sans TC', sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
+    }
+    
+    /* 背景網格 */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    /* 掃描線 */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.3;
     }
     
     /* 導航 */
@@ -41,19 +71,26 @@
       top: 0;
       left: 0;
       right: 0;
-      padding: 2rem 4rem;
+      padding: 1.5rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 100;
-      mix-blend-mode: difference;
+      background: linear-gradient(to bottom, rgba(5,5,8,0.9), transparent);
     }
     
     .logo {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: var(--primary);
+      text-shadow: 0 0 20px var(--primary);
+    }
+    
+    .logo span {
+      color: var(--secondary);
+      text-shadow: 0 0 20px var(--secondary);
     }
     
     .nav-links {
@@ -63,252 +100,445 @@
     }
     
     .nav-links a {
-      color: var(--text);
+      color: var(--text-dim);
       text-decoration: none;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
+      transition: all 0.3s;
       position: relative;
+    }
+    
+    .nav-links a:hover {
+      color: var(--primary);
+      text-shadow: 0 0 10px var(--primary);
+    }
+    
+    .nav-links a::before {
+      content: '[';
+      opacity: 0;
+      margin-right: 5px;
       transition: opacity 0.3s;
     }
     
     .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0;
-      height: 1px;
-      background: var(--accent);
-      transition: width 0.3s ease;
+      content: ']';
+      opacity: 0;
+      margin-left: 5px;
+      transition: opacity 0.3s;
     }
     
+    .nav-links a:hover::before,
     .nav-links a:hover::after {
-      width: 100%;
+      opacity: 1;
     }
     
-    /* Hero 區塊 */
+    /* Hero */
     .hero {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 0 4rem;
+      align-items: center;
+      padding: 0 3rem;
       position: relative;
+      z-index: 1;
     }
     
     .hero-content {
-      max-width: 800px;
+      max-width: 900px;
+    }
+    
+    .hero-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.5em;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--primary);
+      background: rgba(0, 240, 255, 0.05);
     }
     
     .hero h1 {
-      font-family: var(--font-display);
-      font-size: clamp(3rem, 8vw, 7rem);
-      font-weight: 400;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 900;
       line-height: 1.1;
-      margin-bottom: 2rem;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeUp 1s ease forwards;
+      margin-bottom: 1.5rem;
     }
     
-    .hero h1 span {
+    .hero h1 .line {
       display: block;
-      color: var(--accent);
-    }
-    
-    .hero p {
-      font-size: 1.1rem;
-      color: var(--muted);
-      max-width: 500px;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeUp 1s ease 0.3s forwards;
-    }
-    
-    .scroll-indicator {
-      position: absolute;
-      bottom: 3rem;
-      left: 4rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      opacity: 0;
-      animation: fadeUp 1s ease 0.6s forwards;
-    }
-    
-    .scroll-line {
-      width: 60px;
-      height: 1px;
-      background: var(--muted);
-      position: relative;
       overflow: hidden;
     }
     
-    .scroll-line::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 30%;
-      background: var(--accent);
-      animation: scrollMove 2s ease-in-out infinite;
+    .hero h1 .text {
+      display: inline-block;
+      animation: slideUp 0.8s ease forwards;
+      opacity: 0;
+      transform: translateY(100%);
     }
     
-    @keyframes fadeUp {
+    .hero h1 .line:nth-child(1) .text { animation-delay: 0.1s; }
+    .hero h1 .line:nth-child(2) .text { animation-delay: 0.2s; }
+    .hero h1 .line:nth-child(3) .text { animation-delay: 0.3s; }
+    
+    @keyframes slideUp {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
     
-    @keyframes scrollMove {
-      0%, 100% { left: -30%; }
-      50% { left: 100%; }
+    .hero h1 .highlight {
+      color: var(--secondary);
+      text-shadow: 0 0 30px var(--secondary);
+    }
+    
+    .hero p {
+      font-size: 1rem;
+      color: var(--text-dim);
+      max-width: 500px;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeIn 0.8s ease 0.5s forwards;
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    
+    .hero-btns {
+      display: flex;
+      gap: 1.5rem;
+      opacity: 0;
+      animation: fadeIn 0.8s ease 0.7s forwards;
+    }
+    
+    .btn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      padding: 1rem 2rem;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: var(--bg);
+      font-weight: 700;
+    }
+    
+    .btn-primary:hover {
+      box-shadow: 0 0 30px var(--primary);
+      transform: translateY(-2px);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    
+    .btn-outline:hover {
+      background: rgba(0, 240, 255, 0.1);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+    
+    /* 裝飾元素 */
+    .hero-decoration {
+      position: absolute;
+      right: 10%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 300px;
+      height: 300px;
+    }
+    
+    .circle {
+      position: absolute;
+      border: 1px solid var(--primary);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: pulse 4s ease-in-out infinite;
+    }
+    
+    .circle:nth-child(1) {
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+    
+    .circle:nth-child(2) {
+      width: 70%;
+      height: 70%;
+      top: 15%;
+      left: 15%;
+      animation-delay: 0.5s;
+    }
+    
+    .circle:nth-child(3) {
+      width: 40%;
+      height: 40%;
+      top: 30%;
+      left: 30%;
+      animation-delay: 1s;
+    }
+    
+    .circle::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--primary);
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.05); opacity: 0.5; }
+    }
+    
+    /* 統計數字 */
+    .stats {
+      display: flex;
+      gap: 4rem;
+      margin-top: 4rem;
+      opacity: 0;
+      animation: fadeIn 0.8s ease 0.9s forwards;
+    }
+    
+    .stat {
+      text-align: left;
+    }
+    
+    .stat-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
     }
     
     /* 作品集 */
     .works {
-      padding: 8rem 4rem;
+      padding: 8rem 3rem;
+      position: relative;
+      z-index: 1;
     }
     
-    .section-title {
-      font-family: var(--font-display);
-      font-size: 0.85rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--muted);
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
       margin-bottom: 4rem;
     }
     
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.4em;
+      color: var(--text-dim);
+      text-transform: uppercase;
     }
     
-    .gallery-item {
+    .section-title span {
+      display: block;
+      font-size: 2.5rem;
+      color: var(--text);
+      letter-spacing: 0.1em;
+      margin-top: 0.5rem;
+    }
+    
+    .view-all {
+      font-size: 0.75rem;
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+    }
+    
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    
+    .work-item {
+      aspect-ratio: 1;
       position: relative;
-      aspect-ratio: 4/5;
       overflow: hidden;
+      background: var(--bg-secondary);
       cursor: pointer;
     }
     
-    .gallery-item:nth-child(even) {
-      transform: translateY(4rem);
-    }
-    
-    .gallery-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    
-    .gallery-item:hover img {
-      transform: scale(1.05);
-    }
-    
-    .gallery-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-      opacity: 0;
-      transition: opacity 0.4s;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 2rem;
-    }
-    
-    .gallery-item:hover .gallery-overlay {
-      opacity: 1;
-    }
-    
-    .gallery-overlay h3 {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 400;
-      margin-bottom: 0.5rem;
-    }
-    
-    .gallery-overlay p {
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    
-    /* 關於 */
-    .about {
-      padding: 8rem 4rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-    
-    .about-text h2 {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 400;
-      margin-bottom: 2rem;
-    }
-    
-    .about-text p {
-      color: var(--muted);
-      line-height: 1.8;
-      margin-bottom: 1.5rem;
-    }
-    
-    .about-image {
-      aspect-ratio: 3/4;
-      background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .about-image::before {
+    .work-item::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="g" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="0.5" fill="%23333"/></pattern></defs><rect width="100" height="100" fill="url(%23g)"/></svg>');
-      opacity: 0.5;
+      border: 1px solid transparent;
+      transition: all 0.3s;
+      z-index: 2;
+    }
+    
+    .work-item:hover::before {
+      border-color: var(--primary);
+      box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.1);
+    }
+    
+    .work-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+      filter: grayscale(30%);
+    }
+    
+    .work-item:hover img {
+      transform: scale(1.1);
+      filter: grayscale(0%);
+    }
+    
+    .work-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.5rem;
+      background: linear-gradient(to top, rgba(5,5,8,0.95), transparent);
+      transform: translateY(100%);
+      transition: transform 0.3s;
+      z-index: 3;
+    }
+    
+    .work-item:hover .work-info {
+      transform: translateY(0);
+    }
+    
+    .work-info h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+    
+    .work-info p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    
+    .work-id {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.7rem;
+      color: var(--primary);
+      z-index: 3;
+    }
+    
+    /* 技能 */
+    .skills {
+      padding: 8rem 3rem;
+      background: var(--bg-secondary);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    
+    .skill-item {
+      padding: 1.5rem;
+      border: 1px solid #1a1a1f;
+      background: rgba(0, 0, 0, 0.3);
+      transition: all 0.3s;
+    }
+    
+    .skill-item:hover {
+      border-color: var(--tertiary);
+      box-shadow: 0 0 20px rgba(123, 45, 255, 0.2);
+    }
+    
+    .skill-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .skill-name {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .skill-desc {
+      font-size: 0.75rem;
+      color: var(--text-dim);
     }
     
     /* 聯繫 */
     .contact {
-      padding: 8rem 4rem;
+      padding: 8rem 3rem;
       text-align: center;
+      position: relative;
+      z-index: 1;
     }
     
     .contact h2 {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 4rem);
-      font-weight: 400;
-      margin-bottom: 2rem;
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      margin-bottom: 1.5rem;
+    }
+    
+    .contact h2 .highlight {
+      color: var(--primary);
+      text-shadow: 0 0 30px var(--primary);
+    }
+    
+    .contact p {
+      color: var(--text-dim);
+      max-width: 500px;
+      margin: 0 auto 2rem;
     }
     
     .contact-email {
-      font-size: 1.5rem;
-      color: var(--accent);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      color: var(--secondary);
       text-decoration: none;
       position: relative;
+      display: inline-block;
     }
     
     .contact-email::after {
       content: '';
       position: absolute;
-      bottom: -4px;
+      bottom: -5px;
       left: 0;
       width: 100%;
-      height: 1px;
-      background: var(--accent);
+      height: 2px;
+      background: var(--secondary);
       transform: scaleX(0);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s;
     }
     
     .contact-email:hover::after {
@@ -317,64 +547,72 @@
     
     /* 底部 */
     footer {
-      padding: 2rem 4rem;
+      padding: 2rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid #1a1a1f;
+      position: relative;
+      z-index: 1;
     }
     
     footer p {
-      font-size: 0.75rem;
-      color: var(--muted);
+      font-size: 0.7rem;
+      color: var(--text-dim);
     }
     
     .socials {
       display: flex;
-      gap: 2rem;
+      gap: 1.5rem;
     }
     
     .socials a {
-      color: var(--muted);
+      color: var(--text-dim);
       text-decoration: none;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       letter-spacing: 0.1em;
-      text-transform: uppercase;
       transition: color 0.3s;
     }
     
     .socials a:hover {
-      color: var(--accent);
+      color: var(--primary);
     }
     
     /* 響應式 */
+    @media (max-width: 1024px) {
+      .works-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
     @media (max-width: 768px) {
       nav {
-        padding: 1.5rem 2rem;
+        padding: 1rem 1.5rem;
       }
       
       .nav-links {
         display: none;
       }
       
-      .hero, .works, .about, .contact, footer {
-        padding: 0 2rem;
+      .hero, .works, .skills, .contact, footer {
+        padding: 0 1.5rem;
       }
       
-      .gallery {
+      .works-grid, .skills-grid {
         grid-template-columns: 1fr;
       }
       
-      .gallery-item:nth-child(even) {
-        transform: none;
+      .hero-decoration {
+        display: none;
       }
       
-      .about {
-        grid-template-columns: 1fr;
-      }
-      
-      .scroll-indicator {
-        left: 2rem;
+      .stats {
+        flex-direction: column;
+        gap: 2rem;
       }
     }
     
@@ -383,43 +621,70 @@
       position: fixed;
       inset: 0;
       background: var(--bg);
-      z-index: 1000;
+      z-index: 2000;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.5s, visibility 0.5s;
+      flex-direction: column;
+      gap: 2rem;
     }
     
     .loader.hidden {
       opacity: 0;
       visibility: hidden;
+      transition: all 0.5s;
     }
     
-    .loader-text {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      letter-spacing: 0.3em;
-      animation: pulse 1.5s ease-in-out infinite;
+    .loader-logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      text-shadow: 0 0 30px var(--primary);
     }
     
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
+    .loader-bar {
+      width: 200px;
+      height: 2px;
+      background: #1a1a1f;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .loader-bar::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 50%;
+      background: var(--primary);
+      animation: load 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes load {
+      0% { left: -50%; }
+      100% { left: 100%; }
     }
   </style>
 </head>
 <body>
+  <!-- 背景效果 -->
+  <div class="bg-grid"></div>
+  <div class="scanlines"></div>
+  
   <!-- 載入動畫 -->
   <div class="loader">
-    <span class="loader-text">載入中</span>
+    <div class="loader-logo">NEXUS</div>
+    <div class="loader-bar"></div>
   </div>
   
   <!-- 導航 -->
   <nav>
-    <div class="logo">ARTIST</div>
+    <div class="logo">NEXUS<span>.AI</span></div>
     <ul class="nav-links">
       <li><a href="#works">作品</a></li>
-      <li><a href="#about">關於</a></li>
+      <li><a href="#skills">技能</a></li>
       <li><a href="#contact">聯繫</a></li>
     </ul>
   </nav>
@@ -427,83 +692,181 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
-      <h1>創造<span>視覺詩篇</span></h1>
-      <p>探索光影與形態的邊界，在虛無中創造意義。每一個作品都是與世界的對話。</p>
+      <span class="hero-tag">◈ 數位藝術家</span>
+      <h1>
+        <span class="line"><span class="text">在代碼與</span></span>
+        <span class="line"><span class="text highlight">創意的</span></span>
+        <span class="line"><span class="text">邊界探索</span></span>
+      </h1>
+      <p>結合生成式 AI、互動設計與程式藝術，創造沉浸式的數位體驗。每一個專案都是對未來的猜想。</p>
+      
+      <div class="hero-btns">
+        <a href="#works" class="btn btn-primary">探索作品</a>
+        <a href="#contact" class="btn btn-outline">聯繫我</a>
+      </div>
+      
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">專案完成</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">8</div>
+          <div class="stat-label">年經驗</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">12</div>
+          <div class="stat-label">獲獎作品</div>
+        </div>
+      </div>
     </div>
-    <div class="scroll-indicator">
-      <span>滾動</span>
-      <div class="scroll-line"></div>
+    
+    <div class="hero-decoration">
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="circle"></div>
     </div>
   </section>
   
   <!-- 作品集 -->
   <section class="works" id="works">
-    <h2 class="section-title">精選作品</h2>
-    <div class="gallery">
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80" alt="抽象繪畫">
-        <div class="gallery-overlay">
-          <h3>存在的痕跡</h3>
-          <p>2025 · 油畫</p>
+    <div class="section-header">
+      <h2 class="section-title">
+        <span>02</span>
+        精選作品
+      </h2>
+      <a href="#" class="view-all">查看全部 →</a>
+    </div>
+    
+    <div class="works-grid">
+      <div class="work-item">
+        <span class="work-id">001</span>
+        <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&q=80" alt="AI 生成藝術">
+        <div class="work-info">
+          <h3>神經網路夢境</h3>
+          <p>生成式 AI · 2025</p>
         </div>
       </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1549887534-1541e9326642?w=800&q=80" alt="雕塑">
-        <div class="gallery-overlay">
-          <h3>虛空之形</h3>
-          <p>2025 · 雕塑</p>
+      <div class="work-item">
+        <span class="work-id">002</span>
+        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80" alt="數位雕塑">
+        <div class="work-info">
+          <h3>液態幾何</h3>
+          <p>互動裝置 · 2025</p>
         </div>
       </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1482160549825-59d1b23cb208?w=800&q=80" alt="攝影">
-        <div class="gallery-overlay">
-          <h3>光的記憶</h3>
-          <p>2024 · 攝影</p>
+      <div class="work-item">
+        <span class="work-id">003</span>
+        <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=600&q=80" alt="光影裝置">
+        <div class="work-info">
+          <h3>光子領域</h3>
+          <p>沉浸式體驗 · 2024</p>
         </div>
       </div>
-      <div class="gallery-item">
-        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&q=80" alt="數位藝術">
-        <div class="gallery-overlay">
-          <h3>數位夢境</h3>
-          <p>2024 · 數位</p>
+      <div class="work-item">
+        <span class="work-id">004</span>
+        <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=600&q=80" alt="數據視覺化">
+        <div class="work-info">
+          <h3>數據景觀</h3>
+          <p>數據藝術 · 2024</p>
+        </div>
+      </div>
+      <div class="work-item">
+        <span class="work-id">005</span>
+        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&q=80" alt="復古未來">
+        <div class="work-info">
+          <h3>賽博空間</h3>
+          <p>3D 渲染 · 2024</p>
+        </div>
+      </div>
+      <div class="work-item">
+        <span class="work-id">006</span>
+        <img src="https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=600&q=80" alt="聲音視覺化">
+        <div class="work-info">
+          <h3>聲波形態</h3>
+          <p>即時生成 · 2023</p>
         </div>
       </div>
     </div>
   </section>
   
-  <!-- 關於 -->
-  <section class="about" id="about">
-    <div class="about-text">
-      <h2>關於藝術家</h2>
-      <p>專注於探索人類意識與虛擬空間的交界處。作品涵蓋繪畫、雕塑、數位藝術與互動裝置。</p>
-      <p>相信藝術是連結內在與外在世界的橋樑，每個創作都是自我探索的旅程。</p>
-      <p>展覽遍及台北、紐約、倫敦、柏林。</p>
+  <!-- 技能 -->
+  <section class="skills" id="skills">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span>03</span>
+        專業技能
+      </h2>
     </div>
-    <div class="about-image"></div>
+    
+    <div class="skills-grid">
+      <div class="skill-item">
+        <div class="skill-icon">⚡</div>
+        <div class="skill-name">生成式 AI</div>
+        <div class="skill-desc">Midjourney, Stable Diffusion, DALL-E</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">◈</div>
+        <div class="skill-name">互動體驗</div>
+        <div class="skill-desc">Three.js, WebGL, p5.js</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">▣</div>
+        <div class="skill-name">3D 設計</div>
+        <div class="skill-desc">Blender, Cinema 4D, Houdini</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">⬡</div>
+        <div class="skill-name">程式藝術</div>
+        <div class="skill-desc">Processing, Arduino, TouchDesigner</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">◉</div>
+        <div class="skill-name">創意編碼</div>
+        <div class="skill-desc">Python, JavaScript, GLSL</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">◇</div>
+        <div class="skill-name">UI/UX 設計</div>
+        <div class="skill-desc">Figma, Principle, ProtoPie</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">△</div>
+        <div class="skill-name">Motion Design</div>
+        <div class="skill-desc">After Effects, Cinema 4D</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-icon">○</div>
+        <div class="skill-name">NFT 創作</div>
+        <div class="skill-desc">Solana, Ethereum, Generative</div>
+      </div>
+    </div>
   </section>
   
   <!-- 聯繫 -->
   <section class="contact" id="contact">
-    <h2>讓我們對話</h2>
-    <a href="mailto:hello@artist.com" class="contact-email">hello@artist.com</a>
+    <h2>開始<span class="highlight">專案</span></h2>
+    <p>有興趣合作或有問題？歡迎聯繫我，讓我們一起創造未來。</p>
+    <a href="mailto:hello@nexus.art" class="contact-email">hello@nexus.art</a>
   </section>
   
   <!-- 底部 -->
   <footer>
-    <p>© 2026 Artist. All rights reserved.</p>
+    <p>© 2026 NEXUS. All systems operational.</p>
     <div class="socials">
+      <a href="#">Twitter</a>
       <a href="#">Instagram</a>
       <a href="#">Behance</a>
-      <a href="#">Twitter</a>
+      <a href="#">GitHub</a>
     </div>
   </footer>
   
   <script>
-    // 頁面載入完成後隱藏動畫
+    // 頁面載入
     window.addEventListener('load', () => {
       setTimeout(() => {
         document.querySelector('.loader').classList.add('hidden');
-      }, 800);
+      }, 1200);
     });
     
     // 平滑滾動
@@ -532,11 +895,20 @@
       });
     }, observerOptions);
     
-    document.querySelectorAll('.gallery-item').forEach((item, index) => {
+    document.querySelectorAll('.work-item, .skill-item').forEach((item, index) => {
       item.style.opacity = '0';
-      item.style.transform = 'translateY(40px)';
-      item.style.transition = `all 0.6s ease ${index * 0.1}s`;
+      item.style.transform = 'translateY(30px)';
+      item.style.transition = `all 0.5s ease ${index * 0.05}s`;
       observer.observe(item);
+    });
+    
+    // 游標跟隨效果（可選）
+    document.addEventListener('mousemove', (e) => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      
+      document.querySelector('.bg-grid').style.transform = 
+        `translate(${x * 10}px, ${y * 10}px)`;
     });
   </script>
 </body>
